@@ -1,0 +1,10 @@
+node_modules/
+build/
+.gradle/
+local.properties
+.idea/
+*.iml
+*.jks
+*.json
+*.png
+IMAGES TO PUBLISH/

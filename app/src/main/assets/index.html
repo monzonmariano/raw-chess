@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Raw Chess</title>
+    <link rel="stylesheet" href="chessboard-1.0.0.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Raw Chess Server</h1>
+    
+    <!-- THE CURTAIN -->
+    <div id="menu">
+        <div id="menuOptions">
+            <div style="margin: 15px 0; background-color: #2a2a2a; padding: 15px; border-radius: 5px;">
+                <label for="timeControl" style="font-size: 18px; font-weight: bold;">⏱️ Time per player: </label>
+                <select id="timeControl" style="font-size: 18px; padding: 5px; border-radius: 3px;">
+                    <option value="5">5 Minutes</option>
+                    <option value="10">10 Minutes</option>
+                    <option value="15">15 Minutes</option>
+                </select>
+            </div>
+
+            <h2>Multiplayer</h2>
+            <button id="findMatchBtn" class="menu-btn">Find Match Online</button>
+            
+            <hr style="margin: 30px 0; border-color: #444;">
+            
+            <h2>Play vs Computer</h2>
+            
+            <div style="margin: 15px 0;">
+                <div style="font-size: 18px; margin-bottom: 10px;">AI Level:</div>
+                <div id="levelTrack" class="level-container">
+                    <button class="level-btn" data-val="1">1</button>
+                    <button class="level-btn" data-val="2">2</button>
+                    <button class="level-btn" data-val="3">3</button>
+                    <button class="level-btn" data-val="4">4</button>
+                    <button class="level-btn" data-val="5">5</button>
+                    <button class="level-btn" data-val="6">6</button>
+                    <button class="level-btn" data-val="7">7</button>
+                    <button class="level-btn" data-val="8">8</button>
+                    <button class="level-btn" data-val="9">9</button>
+                    <button class="level-btn" data-val="10">10</button>
+                </div>
+            </div>
+            
+            <button id="playAiBtn" class="menu-btn ai-btn">Start AI Game</button>
+        </div>
+        
+        <div id="lobbyWaiting" class="hidden">
+            <div class="spinner"></div>
+            <p>Searching for an opponent...</p>
+            <button id="cancelMatchBtn" class="menu-btn cancel-btn">Cancel Search</button>
+        </div>
+    </div>
+
+    <!-- THE STAGE -->
+    <div id="gameArea" class="hidden">
+        <h2 id="status" style="margin-bottom: 15px;">Waiting for opponent...</h2>
+        
+        <!-- Opponent Header (Top) -->
+        <div class="player-bar">
+            <h3 id="opponentNameLabel">Opponent</h3>
+            <div id="opponentClock" class="clock">00:00</div>
+        </div>
+        
+        <div id="board" style="width: 400px; margin: 10px auto;"></div>
+        
+        <!-- Player Header (Bottom) -->
+        <div class="player-bar">
+            <h3 id="playerNameLabel">Guest</h3>
+            <div id="playerClock" class="clock">00:00</div>
+        </div>
+        
+        <!-- In-Game Controls -->
+        <div id="gameControls" style="display: flex; justify-content: space-between; margin-top: 10px; width: 400px; margin-left: auto; margin-right: auto;">
+            <button id="offerDrawBtn" class="action-btn" style="background-color: #607D8B;">🤝 Offer Draw</button>
+            <button id="resignBtn" class="action-btn" style="background-color: #d32f2f;">🏳️ Resign</button>
+        </div>
+        
+        <button id="quitBtn" class="menu-btn cancel-btn" style="margin-top: 20px;">Quit to Menu</button>
+    </div>
+    
+    <!-- Pawn Promotion Modal -->
+    <div id="promotionModal" class="hidden">
+        <div class="promotion-content">
+            <h3 style="margin-top: 0; color: #4CAF50;">Promote Pawn</h3>
+            <button class="promo-btn" data-piece="q">♛ Queen</button>
+            <button class="promo-btn" data-piece="n">♞ Knight</button>
+            <button class="promo-btn" data-piece="r">♜ Rook</button>
+            <button class="promo-btn" data-piece="b">♝ Bishop</button>
+            <button id="cancelPromoBtn" class="menu-btn cancel-btn" style="margin-top: 15px; width: 100%;">Cancel</button>
+        </div>
+    </div>
+
+    <!-- Draw Offer Modal -->
+    <div id="drawOfferModal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.85); display: flex; justify-content: center; align-items: center; z-index: 1001;">
+        <div class="promotion-content">
+            <h3 style="margin-top: 0; color: #fff;">Opponent offers a draw</h3>
+            <button id="acceptDrawBtn" class="promo-btn" style="background-color: #4CAF50;">✅ Accept</button>
+            <button id="declineDrawBtn" class="promo-btn" style="background-color: #f44336;">❌ Decline</button>
+        </div>
+    </div>
+    
+    <script src="jquery-3.5.1.min.js"></script>
+    <script src="chessboard-1.0.0.min.js"></script>
+    <script src="chess.min.js"></script>
+    <script src="game.js"></script>
+</body>
+</html>
