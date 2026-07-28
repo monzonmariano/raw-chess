@@ -50,6 +50,44 @@ document.getElementById('closeAlertBtn').addEventListener('click', function() {
     document.getElementById('customAlertModal').classList.add('hidden');
 });
 
+// --- VARIABLES GLOBALES NUEVAS ---
+var currentTimePref = "5"; 
+
+// --- CARGAR ALIAS ---
+var nameInput = document.getElementById('playerNameInput');
+if(nameInput) {
+    nameInput.value = localStorage.getItem('rawChessAlias') || "";
+}
+
+function getPlayerName() {
+    var input = document.getElementById('playerNameInput');
+    var name = input ? input.value.trim() : "";
+    if (name === "") name = "Guest";
+    localStorage.setItem('rawChessAlias', name); 
+    return name;
+}
+
+// --- EVENTOS DE INTERFAZ ---
+$('.time-btn').on('click', function() {
+    currentTimePref = $(this).attr('data-val');
+    $('.time-btn').removeClass('active track');
+    $('.time-btn').each(function() {
+        var val = $(this).attr('data-val');
+        if (val === currentTimePref) $(this).addClass('active');
+        else $(this).addClass('track');
+    });
+});
+
+function showCustomAlert(msg) {
+    document.getElementById('customAlertText').innerText = msg;
+    document.getElementById('customAlertModal').classList.remove('hidden');
+}
+
+document.getElementById('closeAlertBtn').addEventListener('click', function() {
+    document.getElementById('customAlertModal').classList.add('hidden');
+});
+
+// --- LÓGICA DE JUEGO (RELOJES Y TABLERO) ---
 function removeHighlights() {
     $('#board .square-55d63').removeClass('highlight-move');
 }
@@ -148,6 +186,7 @@ function updateClockHTML() {
     }
 }
 
+// --- LÓGICA DE WEBSOCKETS Y MULTIJUGADOR ---
 function connectToServer(joinPayload) {
     isAiGame = false;
     document.getElementById('menuOptions').classList.add('hidden');
@@ -155,9 +194,6 @@ function connectToServer(joinPayload) {
     
     var displayCode = document.getElementById('displayRoomCode');
     if(displayCode) displayCode.innerText = ""; 
-    
-    var shareBtn = document.getElementById('shareRoomBtn');
-    if (shareBtn) shareBtn.classList.add('hidden');
 
     socket = new WebSocket("ws://localhost:8001");
 
@@ -171,7 +207,6 @@ function connectToServer(joinPayload) {
         if (data.type === 'room_created') {
             document.getElementById('waitingText').innerText = "Share this code with your opponent:";
             document.getElementById('displayRoomCode').innerText = data.code;
-            if (shareBtn) shareBtn.classList.remove('hidden');
         }
         else if (data.type === 'error') {
             showCustomAlert(data.message);
@@ -181,6 +216,7 @@ function connectToServer(joinPayload) {
             document.getElementById('menu').classList.add('hidden');
             document.getElementById('gameArea').classList.remove('hidden');
             
+            // --- NUEVO: Sincronizar el tiempo exacto que dicta el servidor ---
             if (data.time) {
                 currentTimePref = data.time;
             }
@@ -309,6 +345,7 @@ document.getElementById('quitBtn').addEventListener('click', function() {
     document.getElementById('lobbyWaiting').classList.add('hidden');
 });
 
+// --- INTELIGENCIA ARTIFICIAL ---
 var engine = null;
 
 $.get('stockfish.js', function(stockfishCode) {
@@ -351,6 +388,7 @@ document.getElementById('playAiBtn').addEventListener('click', function() {
     myColor = 'w'; 
     board.orientation('white');
     
+    // Recalcular el tamaño del tablero basado en la pantalla actual
     setTimeout(function() { board.resize(); }, 100); 
     
     startClocks();
@@ -451,6 +489,7 @@ $('#declineDrawBtn').on('click', function() {
     socket.send(JSON.stringify({ type: 'decline_draw' }));
 });
 
+// --- LÓGICA DE MOVIMIENTOS EN TABLERO ---
 var selectedSquare = null;
 var tapDebounce = false;
 var pendingPromotion = null; 

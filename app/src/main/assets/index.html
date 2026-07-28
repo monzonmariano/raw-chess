@@ -75,8 +75,6 @@
                 <div class="spinner"></div>
                 <p id="waitingText">Searching for an opponent...</p>
                 <h1 id="displayRoomCode" style="color: #9C27B0; letter-spacing: 2px;"></h1>
-                <button id="shareRoomBtn" class="menu-btn hidden" style="background-color: #2196F3; margin-top: 0; padding: 10px 20px;">📤 Share Code</button>
-                <br>
                 <button id="cancelMatchBtn" class="menu-btn cancel-btn">Cancel Search</button>
             </div>
         </div>
@@ -90,19 +88,17 @@
                 <div id="opponentClock" class="clock">00:00</div>
             </div>
             
-            <div id="board" class="responsive-box" style="margin: 10px auto;"></div>
-        
-        <!-- Player Header (Bottom) -->
-        <div class="player-bar">
-            <h3 id="playerNameLabel">Guest</h3>
-            <div id="playerClock" class="clock">00:00</div>
-        </div>
-        
-        <!-- In-Game Controls -->
-        <div id="gameControls" class="responsive-box" style="display: flex; justify-content: space-between; margin-top: 10px; margin-left: auto; margin-right: auto;">
-            <button id="offerDrawBtn" class="action-btn" style="background-color: #607D8B;">🤝 Offer Draw</button>
-            <button id="resignBtn" class="action-btn" style="background-color: #d32f2f;">🏳️ Resign</button>
-        </div>
+            <div id="board" style="width: 100%; max-width: 400px; margin: 10px auto;"></div>
+            
+            <div class="player-bar">
+                <h3 id="playerNameLabel">Guest</h3>
+                <div id="playerClock" class="clock">00:00</div>
+            </div>
+            
+            <div id="gameControls" style="display: flex; justify-content: space-between; margin-top: 10px; width: 100%; max-width: 400px; margin-left: auto; margin-right: auto;">
+                <button id="offerDrawBtn" class="action-btn" style="background-color: #607D8B;">🤝 Offer Draw</button>
+                <button id="resignBtn" class="action-btn" style="background-color: #d32f2f;">🏳️ Resign</button>
+            </div>
             
             <button id="quitBtn" class="menu-btn cancel-btn" style="margin-top: 20px;">Quit to Menu</button>
         </div>

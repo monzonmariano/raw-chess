@@ -14,18 +14,6 @@ private_rooms = {}
 def generate_room_code():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
 
-async def room_timeout(code, host_ws):
-    await asyncio.sleep(60)
-    if code in private_rooms and private_rooms[code]['ws'] == host_ws:
-        del private_rooms[code]
-        try:
-            await host_ws.send(json.dumps({
-                "type": "error", 
-                "message": "Room timeout. No one joined in 60 seconds."
-            }))
-        except:
-            pass
-
 async def chess_server(websocket):
     try:
         async for message in websocket:
@@ -49,12 +37,13 @@ async def chess_server(websocket):
                         player_to_room[p1] = room_id
                         player_to_room[p2] = room_id
                         
+                        # NUEVO: Le enviamos a ambos el tiempo oficial de la partida
                         await p1.send(json.dumps({"type": "init", "color": "w", "opponent_name": player_names[p2], "time": time_pref}))
                         await p2.send(json.dumps({"type": "init", "color": "b", "opponent_name": player_names[p1], "time": time_pref}))
 
             elif data.get('type') == 'create_private':
                 custom_code = data.get('custom_code', '').upper()
-                time_pref = str(data.get('time', '5'))
+                time_pref = str(data.get('time', '5')) # NUEVO: Obtenemos el tiempo del host
                 
                 if custom_code:
                     if custom_code in private_rooms:
@@ -66,16 +55,16 @@ async def chess_server(websocket):
                     while code in private_rooms:
                         code = generate_room_code()
                     
+                # NUEVO: Ahora guardamos el websocket Y el tiempo en un diccionario
                 private_rooms[code] = {'ws': websocket, 'time': time_pref}
                 await websocket.send(json.dumps({"type": "room_created", "code": code}))
-                asyncio.create_task(room_timeout(code, websocket))
 
             elif data.get('type') == 'join_private':
                 code = data.get('code', '').upper()
                 if code in private_rooms:
-                    room_data = private_rooms.pop(code)
+                    room_data = private_rooms.pop(code) # Sacamos los datos de la sala
                     p1 = room_data['ws']
-                    match_time = room_data['time']
+                    match_time = room_data['time'] # NUEVO: Rescatamos el tiempo del host
                     p2 = websocket
                     
                     room_id = str(uuid.uuid4())[:8]
@@ -83,6 +72,7 @@ async def chess_server(websocket):
                     player_to_room[p1] = room_id
                     player_to_room[p2] = room_id
                     
+                    # NUEVO: Imponemos el tiempo del host a ambos jugadores
                     await p1.send(json.dumps({"type": "init", "color": "w", "opponent_name": player_names[p2], "time": match_time}))
                     await p2.send(json.dumps({"type": "init", "color": "b", "opponent_name": player_names[p1], "time": match_time}))
                 else:
@@ -103,6 +93,7 @@ async def chess_server(websocket):
             if websocket in waiting_lines[time_pref]:
                 waiting_lines[time_pref].remove(websocket)
                 
+        # NUEVO: Actualizamos la forma de limpiar la sala si el host se desconecta
         for code, room_data in list(private_rooms.items()):
             if room_data['ws'] == websocket:
                 del private_rooms[code]
