@@ -16,6 +16,39 @@ var manualDraw = false;
 var audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 var gameOverSoundPlayed = false;
 var currentAiLevel = 3; 
+var currentTimePref = "5"; 
+
+var nameInput = document.getElementById('playerNameInput');
+if(nameInput) {
+    nameInput.value = localStorage.getItem('rawChessAlias') || "";
+}
+
+function getPlayerName() {
+    var input = document.getElementById('playerNameInput');
+    var name = input ? input.value.trim() : "";
+    if (name === "") name = "Guest";
+    localStorage.setItem('rawChessAlias', name); 
+    return name;
+}
+
+$('.time-btn').on('click', function() {
+    currentTimePref = $(this).attr('data-val');
+    $('.time-btn').removeClass('active track');
+    $('.time-btn').each(function() {
+        var val = $(this).attr('data-val');
+        if (val === currentTimePref) $(this).addClass('active');
+        else $(this).addClass('track');
+    });
+});
+
+function showCustomAlert(msg) {
+    document.getElementById('customAlertText').innerText = msg;
+    document.getElementById('customAlertModal').classList.remove('hidden');
+}
+
+document.getElementById('closeAlertBtn').addEventListener('click', function() {
+    document.getElementById('customAlertModal').classList.add('hidden');
+});
 
 function removeHighlights() {
     $('#board .square-55d63').removeClass('highlight-move');
@@ -73,7 +106,7 @@ function triggerScreenShake() {
 }
 
 function startClocks() {
-    var minutes = parseInt(document.getElementById('timeControl').value);
+    var minutes = parseInt(currentTimePref);
     whiteTime = minutes * 60;
     blackTime = minutes * 60;
     timeoutLoser = null;
@@ -115,30 +148,42 @@ function updateClockHTML() {
     }
 }
 
-document.getElementById('findMatchBtn').addEventListener('click', function() {
+function connectToServer(joinPayload) {
     isAiGame = false;
     document.getElementById('menuOptions').classList.add('hidden');
     document.getElementById('lobbyWaiting').classList.remove('hidden');
+    
+    var displayCode = document.getElementById('displayRoomCode');
+    if(displayCode) displayCode.innerText = ""; 
+    
+    var shareBtn = document.getElementById('shareRoomBtn');
+    if (shareBtn) shareBtn.classList.add('hidden');
 
     socket = new WebSocket("ws://localhost:8001");
 
     socket.onopen = function() {
-        var timePref = document.getElementById('timeControl').value;
-        var myName = window.playerName || "Guest"; 
-        
-        socket.send(JSON.stringify({
-            "type": "join", 
-            "time": timePref,
-            "name": myName
-        }));
+        socket.send(JSON.stringify(joinPayload));
     };
 
     socket.onmessage = function(event) {
         var data = JSON.parse(event.data);
         
-        if (data.type === 'init') {
+        if (data.type === 'room_created') {
+            document.getElementById('waitingText').innerText = "Share this code with your opponent:";
+            document.getElementById('displayRoomCode').innerText = data.code;
+            if (shareBtn) shareBtn.classList.remove('hidden');
+        }
+        else if (data.type === 'error') {
+            showCustomAlert(data.message);
+            document.getElementById('cancelMatchBtn').click();
+        }
+        else if (data.type === 'init') {
             document.getElementById('menu').classList.add('hidden');
             document.getElementById('gameArea').classList.remove('hidden');
+            
+            if (data.time) {
+                currentTimePref = data.time;
+            }
             
             myColor = data.color;
             board.orientation(myColor === 'b' ? 'black' : 'white');
@@ -146,6 +191,7 @@ document.getElementById('findMatchBtn').addEventListener('click', function() {
             startClocks(); 
             
             document.getElementById('opponentNameLabel').innerText = data.opponent_name;
+            document.getElementById('playerNameLabel').innerText = getPlayerName();
             
             playSound('start'); 
             gameOverSoundPlayed = false;
@@ -171,7 +217,7 @@ document.getElementById('findMatchBtn').addEventListener('click', function() {
             } 
             else if (data.type === 'decline_draw') {
                 $('#offerDrawBtn').text('🤝 Offer Draw').prop('disabled', false);
-                alert("Opponent declined the draw offer.");
+                showCustomAlert("Opponent declined the draw offer.");
             } 
             else if (data.from && data.to) {
                 playSound('move'); 
@@ -182,12 +228,57 @@ document.getElementById('findMatchBtn').addEventListener('click', function() {
             }
         }
     };
+}
+
+document.getElementById('findMatchBtn').addEventListener('click', function() {
+    document.getElementById('waitingText').innerText = "Searching for an opponent...";
+    connectToServer({
+        "type": "join", 
+        "time": currentTimePref,
+        "name": getPlayerName()
+    });
 });
+
+var createBtn = document.getElementById('createPrivateBtn');
+if (createBtn) {
+    createBtn.addEventListener('click', function() {
+        var customInput = document.getElementById('customRoomCodeInput');
+        var customCode = customInput ? customInput.value.trim().toUpperCase() : "";
+        
+        document.getElementById('waitingText').innerText = "Creating room...";
+        connectToServer({
+            "type": "create_private", 
+            "time": currentTimePref,
+            "name": getPlayerName(),
+            "custom_code": customCode 
+        });
+    });
+}
+
+var joinBtn = document.getElementById('joinPrivateBtn');
+if (joinBtn) {
+    joinBtn.addEventListener('click', function() {
+        var codeInput = document.getElementById('roomCodeInput');
+        var code = codeInput ? codeInput.value.trim() : "";
+        if (code.length === 0) {
+            showCustomAlert("Please enter a room code.");
+            return;
+        }
+        document.getElementById('waitingText').innerText = "Joining room...";
+        connectToServer({
+            "type": "join_private", 
+            "code": code,
+            "name": getPlayerName()
+        });
+    });
+}
 
 document.getElementById('cancelMatchBtn').addEventListener('click', function() {
     if (socket) socket.close();
     document.getElementById('lobbyWaiting').classList.add('hidden');
     document.getElementById('menuOptions').classList.remove('hidden');
+    var shareBtn = document.getElementById('shareRoomBtn');
+    if (shareBtn) shareBtn.classList.add('hidden');
 });
 
 document.getElementById('quitBtn').addEventListener('click', function() {
@@ -200,7 +291,6 @@ document.getElementById('quitBtn').addEventListener('click', function() {
     resignedPlayer = null;
     manualDraw = false;
 
-    // FIX: Remove the shake animation class so it doesn't replay next time!
     var boardEl = document.getElementById('board');
     if (boardEl) boardEl.classList.remove('shake-anim');
     
@@ -260,7 +350,9 @@ document.getElementById('playAiBtn').addEventListener('click', function() {
     
     myColor = 'w'; 
     board.orientation('white');
-    board.resize();
+    
+    setTimeout(function() { board.resize(); }, 100); 
+    
     startClocks();
     
     playSound('start'); 
@@ -280,7 +372,8 @@ function updateStatus() {
     var moveColor = game.turn() === 'w' ? 'White' : 'Black';
 
     if (opponentLeft) {
-        statusText = 'Game over, opponent disconnected.';
+        // ¡Le damos la victoria explícita al jugador que se quedó!
+        statusText = 'Game over, opponent disconnected. You win! 🏆';
     } else if (resignedPlayer) {
         var winner = resignedPlayer === 'w' ? 'Black' : 'White';
         statusText = 'Game over, ' + winner + ' wins by resignation.';
@@ -338,7 +431,7 @@ $('#resignBtn').on('click', function() {
 $('#offerDrawBtn').on('click', function() {
     if (game.game_over() || timeoutLoser || opponentLeft || resignedPlayer || manualDraw) return;
     if (isAiGame) {
-        alert("The AI does not accept draws!");
+        showCustomAlert("The AI does not accept draws!");
         return;
     }
     
@@ -465,7 +558,9 @@ $('.promo-btn').on('click', function() {
     var pieceChoice = $(this).attr('data-piece'); 
     document.getElementById('promotionModal').classList.add('hidden');
     
-    executeMove(pendingPromotion.from, pendingPromotion.to, pieceChoice);
+    if (pieceChoice !== "cancel") {
+        executeMove(pendingPromotion.from, pendingPromotion.to, pieceChoice);
+    }
     pendingPromotion = null;
 });
 
@@ -483,16 +578,8 @@ var config = {
 };
 board = Chessboard('board', config);
 
-var checkName = setInterval(function() {
-    if (window.playerName) {
-        document.getElementById('playerNameLabel').innerText = window.playerName;
-        clearInterval(checkName);
-    }
-}, 200); 
-setTimeout(function() { clearInterval(checkName); }, 3000);
-
 function updateLevelUI(selectedLevel) {
-    $('.level-btn').each(function() {
+    $('.ai-lvl-btn').each(function() {
         var val = parseInt($(this).attr('data-val'));
         $(this).removeClass('active track');
         if (val === selectedLevel) $(this).addClass('active');
@@ -500,7 +587,33 @@ function updateLevelUI(selectedLevel) {
     });
 }
 updateLevelUI(currentAiLevel);
-$('.level-btn').on('click', function() {
+
+$('.ai-lvl-btn').on('click', function() {
     currentAiLevel = parseInt($(this).attr('data-val'));
     updateLevelUI(currentAiLevel);
+});
+
+var shareBtn = document.getElementById('shareRoomBtn');
+if (shareBtn) {
+    shareBtn.addEventListener('click', function() {
+        var code = document.getElementById('displayRoomCode').innerText;
+        var shareText = 'Join my Raw Chess match! Room Code: ' + code;
+        
+        if (navigator.share) {
+            navigator.share({
+                title: 'Raw Chess',
+                text: shareText
+            }).catch(function(err) { console.log('Error sharing:', err); });
+        } else {
+            navigator.clipboard.writeText(shareText);
+            showCustomAlert("Code copied to clipboard!");
+        }
+    });
+}
+
+// --- NUEVO: RE-ESCALADO AUTOMÁTICO EN PC ---
+window.addEventListener('resize', function() {
+    if (board) {
+        board.resize();
+    }
 });
