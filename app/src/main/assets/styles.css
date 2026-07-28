@@ -28,17 +28,17 @@ body {
     cursor: pointer;
     border-radius: 5px;
     margin: 10px;
-    transition: filter 0.2s ease; /* Transición suave */
+    transition: filter 0.2s ease;
 }
 .menu-btn:hover { filter: brightness(1.2); }
 .ai-btn { background-color: #008CBA; }
 .cancel-btn { background-color: #f44336; }
 
-/* Contenedores oscuros (paneles) */
+/* Contenedores oscuros (paneles) - Optimizados para móviles */
 .dark-panel {
-    margin: 15px 0;
+    margin: 8px 0;
     background-color: #2a2a2a;
-    padding: 15px;
+    padding: 10px;
     border-radius: 5px;
 }
 
@@ -79,7 +79,7 @@ body {
     font-weight: bold; cursor: pointer; 
     transition: all 0.2s; 
 }
-.level-btn:hover { filter: brightness(1.4); } /* Hover para los cuadraditos */
+.level-btn:hover { filter: brightness(1.4); }
 .level-btn.track { background: #388E3C; border-color: #388E3C; }
 .level-btn.active { background: #4CAF50; border-color: #4CAF50; transform: scale(1.1); box-shadow: 0 0 10px #4CAF50; }
 
@@ -186,4 +186,45 @@ input[type="text"] {
     border: 1px solid #555;
     background-color: #fff;
     color: #000;
+}
+
+/* --- Ajustes específicos para evitar cortes en menú y saltos en Game Over --- */
+#menuOptions div[style*="border: 1px solid"] {
+    margin-top: 8px !important;
+    padding: 10px !important;
+}
+
+#menuOptions h2 {
+    margin: 10px 0 5px 0;
+}
+
+#status {
+    min-height: 52px; 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    font-size: 18px;
+    line-height: 1.3;
+}
+
+/* --- Diseño Responsivo (Móvil vs PC) --- */
+.responsive-box {
+    width: 100%;
+    max-width: 400px;
+}
+
+@media (min-width: 768px) {
+    .app-container {
+        max-width: 100%;
+    }
+    .responsive-box, .player-bar {
+        max-width: 70vh; 
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .clock {
+        font-size: 32px; 
+        width: 130px;
+    }
 }
