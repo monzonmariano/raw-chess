@@ -4,6 +4,7 @@ import json
 import uuid
 import random
 import string
+import os
 
 waiting_lines = {'5': [], '10': [], '15': [], '30': [], '60': []}
 rooms = {}
@@ -121,8 +122,11 @@ async def chess_server(websocket):
             del player_names[websocket]
 
 async def main():
-    async with websockets.serve(chess_server, "0.0.0.0", 8001):
-        print("Raw Chess Server 2.0 active on port 8001")
+    # Si Render nos da un puerto lo usamos, sino usamos 8001 para local
+    port = int(os.environ.get("PORT", 8001))
+    
+    async with websockets.serve(chess_server, "0.0.0.0", port):
+        print(f"Raw Chess Server 2.0 active on port {port}")
         await asyncio.Future()
 
 if __name__ == "__main__":

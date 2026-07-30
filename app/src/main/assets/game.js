@@ -18,6 +18,20 @@ var gameOverSoundPlayed = false;
 var currentAiLevel = 3; 
 var currentTimePref = "5"; 
 
+// ==========================================
+// CONFIGURACIÓN DEL SERVIDOR (LOCAL VS NUBE)
+// ==========================================
+
+// 1. Para pruebas en tu propia PC:
+// var SERVER_URL = "ws://localhost:8001";
+
+// 2. Para pruebas en LAN (de PC a celular, pon tu IP):
+// var SERVER_URL = "ws://192.168.X.X:8001";
+
+// 3. Para PRODUCCIÓN (Render - Play Store):
+var SERVER_URL = "wss://tu-servidor-chess.onrender.com"; 
+// ==========================================
+
 var nameInput = document.getElementById('playerNameInput');
 if(nameInput) {
     nameInput.value = localStorage.getItem('rawChessAlias') || "";
@@ -195,7 +209,8 @@ function connectToServer(joinPayload) {
     var displayCode = document.getElementById('displayRoomCode');
     if(displayCode) displayCode.innerText = ""; 
 
-    socket = new WebSocket("ws://localhost:8001");
+    //socket = new WebSocket("ws://localhost:8001");
+    socket = new WebSocket(SERVER_URL);
 
     socket.onopen = function() {
         socket.send(JSON.stringify(joinPayload));
