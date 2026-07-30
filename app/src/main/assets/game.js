@@ -222,6 +222,9 @@ function connectToServer(joinPayload) {
         if (data.type === 'room_created') {
             document.getElementById('waitingText').innerText = "Share this code with your opponent:";
             document.getElementById('displayRoomCode').innerText = data.code;
+            // ¡Magia! Hacemos visible el botón de compartir
+            var shareBtn = document.getElementById('shareRoomBtn');
+            if (shareBtn) shareBtn.classList.remove('hidden');
         }
         else if (data.type === 'error') {
             showCustomAlert(data.message);
