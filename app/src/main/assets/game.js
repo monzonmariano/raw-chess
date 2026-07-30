@@ -29,7 +29,7 @@ var currentTimePref = "5";
 // var SERVER_URL = "ws://192.168.X.X:8001";
 
 // 3. Para PRODUCCIÓN (Render - Play Store):
-var SERVER_URL = "wss://tu-servidor-chess.onrender.com"; 
+var SERVER_URL = "wss://raw-chess.onrender.com"; 
 // ==========================================
 
 var nameInput = document.getElementById('playerNameInput');
