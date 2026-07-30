@@ -16,6 +16,7 @@ def generate_room_code():
     return ''.join(random.choices(string.ascii_uppercase + string.digits, k=5))
 
 async def chess_server(websocket):
+    print(f"🟢 ¡Nueva conexión detectada desde la app!", flush=True)
     try:
         async for message in websocket:
             data = json.loads(message)
