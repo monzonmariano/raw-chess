@@ -325,7 +325,20 @@ if (joinBtn) {
 }
 
 document.getElementById('cancelMatchBtn').addEventListener('click', function() {
-    if (socket) socket.close();
+    
+    // --- FIX DEL JUGADOR FANTASMA ---
+    // 1. Le gritamos explícitamente al servidor "¡Sácame de la lista de espera!"
+    if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({ type: "cancel" }));
+    }
+    
+    // 2. Ahora sí cerramos la conexión y, muy importante, la destruimos (null)
+    if (socket) { 
+        socket.close(); 
+        socket = null; 
+    }
+    // ---------------------------------
+
     document.getElementById('lobbyWaiting').classList.add('hidden');
     document.getElementById('menuOptions').classList.remove('hidden');
     var shareBtn = document.getElementById('shareRoomBtn');
