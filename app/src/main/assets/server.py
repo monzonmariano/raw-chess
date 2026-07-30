@@ -28,24 +28,42 @@ async def chess_server(websocket):
                 if time_pref not in waiting_lines:
                     waiting_lines[time_pref] = []
                 
-                if time_pref in waiting_lines:
-                    waiting_lines[time_pref].append(websocket)
-                    if len(waiting_lines[time_pref]) >= 2:
-                        p1 = waiting_lines[time_pref].pop(0)
-                        p2 = waiting_lines[time_pref].pop(0)
-                        
-                        room_id = str(uuid.uuid4())[:8]
-                        rooms[room_id] = {'w': p1, 'b': p2}
-                        player_to_room[p1] = room_id
-                        player_to_room[p2] = room_id
-                        
-                        # NUEVO: Le enviamos a ambos el tiempo oficial de la partida
-                        await p1.send(json.dumps({"type": "init", "color": "w", "opponent_name": player_names[p2], "time": time_pref}))
-                        await p2.send(json.dumps({"type": "init", "color": "b", "opponent_name": player_names[p1], "time": time_pref}))
+                # --- FIX FANTASMA 1: Evitar clones ---
+                # Si el jugador envía 'join' varias veces, lo borramos primero
+                # de todas las listas para asegurarnos de que solo exista una vez.
+                for t in waiting_lines:
+                    if websocket in waiting_lines[t]:
+                        waiting_lines[t].remove(websocket)
+                
+                # Ahora sí, lo anotamos en la cola de forma segura
+                waiting_lines[time_pref].append(websocket)
+                
+                if len(waiting_lines[time_pref]) >= 2:
+                    p1 = waiting_lines[time_pref].pop(0)
+                    p2 = waiting_lines[time_pref].pop(0)
+                    
+                    room_id = str(uuid.uuid4())[:8]
+                    rooms[room_id] = {'w': p1, 'b': p2}
+                    player_to_room[p1] = room_id
+                    player_to_room[p2] = room_id
+                    
+                    await p1.send(json.dumps({"type": "init", "color": "w", "opponent_name": player_names[p2], "time": time_pref}))
+                    await p2.send(json.dumps({"type": "init", "color": "b", "opponent_name": player_names[p1], "time": time_pref}))
+
+            # --- FIX FANTASMA 2: Manejar la orden de cancelar ---
+            # Si el frontend envía una cancelación explícita, limpiamos su rastro
+            elif data.get('type') == 'cancel':
+                for t in waiting_lines:
+                    if websocket in waiting_lines[t]:
+                        waiting_lines[t].remove(websocket)
+                
+                for code, room_data in list(private_rooms.items()):
+                    if room_data['ws'] == websocket:
+                        del private_rooms[code]
 
             elif data.get('type') == 'create_private':
                 custom_code = data.get('custom_code', '').upper()
-                time_pref = str(data.get('time', '5')) # NUEVO: Obtenemos el tiempo del host
+                time_pref = str(data.get('time', '5')) 
                 
                 if custom_code:
                     if custom_code in private_rooms:
@@ -57,24 +75,28 @@ async def chess_server(websocket):
                     while code in private_rooms:
                         code = generate_room_code()
                     
-                # NUEVO: Ahora guardamos el websocket Y el tiempo en un diccionario
                 private_rooms[code] = {'ws': websocket, 'time': time_pref}
                 await websocket.send(json.dumps({"type": "room_created", "code": code}))
 
             elif data.get('type') == 'join_private':
                 code = data.get('code', '').upper()
                 if code in private_rooms:
-                    room_data = private_rooms.pop(code) # Sacamos los datos de la sala
+                    room_data = private_rooms.pop(code) 
                     p1 = room_data['ws']
-                    match_time = room_data['time'] # NUEVO: Rescatamos el tiempo del host
+                    match_time = room_data['time'] 
                     p2 = websocket
+                    
+                    # FIX DE SEGURIDAD EXTRA: Evitar que seas host e invitado al mismo tiempo
+                    if p1 == p2:
+                        await websocket.send(json.dumps({"type": "error", "message": "No puedes unirte a tu propia sala."}))
+                        private_rooms[code] = room_data # Restauramos la sala
+                        continue
                     
                     room_id = str(uuid.uuid4())[:8]
                     rooms[room_id] = {'w': p1, 'b': p2}
                     player_to_room[p1] = room_id
                     player_to_room[p2] = room_id
                     
-                    # NUEVO: Imponemos el tiempo del host a ambos jugadores
                     await p1.send(json.dumps({"type": "init", "color": "w", "opponent_name": player_names[p2], "time": match_time}))
                     await p2.send(json.dumps({"type": "init", "color": "b", "opponent_name": player_names[p1], "time": match_time}))
                 else:
@@ -95,7 +117,6 @@ async def chess_server(websocket):
             if websocket in waiting_lines[time_pref]:
                 waiting_lines[time_pref].remove(websocket)
                 
-        # NUEVO: Actualizamos la forma de limpiar la sala si el host se desconecta
         for code, room_data in list(private_rooms.items()):
             if room_data['ws'] == websocket:
                 del private_rooms[code]
@@ -123,7 +144,6 @@ async def chess_server(websocket):
             del player_names[websocket]
 
 async def main():
-    # Si Render nos da un puerto lo usamos, sino usamos 8001 para local
     port = int(os.environ.get("PORT", 8001))
     
     async with websockets.serve(chess_server, "0.0.0.0", port):
