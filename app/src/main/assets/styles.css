@@ -228,3 +228,21 @@ input[type="text"] {
         width: 130px;
     }
 }
+
+/* --- Ajustes proporcionales para Menú en PC y TV --- */
+#menuOptions {
+    width: 100%;
+    /* En lugar de 500px, usamos 70vh. Así el menú siempre tendrá un tamaño armónico respecto al tablero */
+    max-width: 70vh; 
+    margin: 0 auto;
+}
+
+/* --- MODO TV / MONITORES GIGANTES --- */
+/* Si la pantalla tiene más de 1600px de ancho (Monitores grandes o TVs) */
+@media (min-width: 1600px) {
+    .app-container {
+        /* Hacemos un zoom automático de todo el juego al 150% */
+        transform: scale(1.5);
+        transform-origin: top center;
+    }
+}
