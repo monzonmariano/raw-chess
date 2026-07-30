@@ -237,12 +237,3 @@ input[type="text"] {
     margin: 0 auto;
 }
 
-/* --- MODO TV / MONITORES GIGANTES --- */
-/* Si la pantalla tiene más de 1600px de ancho (Monitores grandes o TVs) */
-@media (min-width: 1600px) {
-    .app-container {
-        /* Hacemos un zoom automático de todo el juego al 150% */
-        transform: scale(1.5);
-        transform-origin: top center;
-    }
-}
