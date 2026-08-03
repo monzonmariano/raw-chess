@@ -85,26 +85,38 @@
 
         <!-- THE STAGE -->
         <div id="gameArea" class="hidden">
-            <h2 id="status" style="margin-bottom: 15px;">Waiting for opponent...</h2>
             
-            <div class="player-bar">
-                <h3 id="opponentNameLabel">Opponent</h3>
-                <div id="opponentClock" class="clock">00:00</div>
+            <div class="desktop-layout">
+                
+                <!-- Columna Izquierda: Tablero y Jugadores -->
+                <div class="board-column">
+                    <div class="player-bar">
+                        <h3 id="opponentNameLabel">Opponent</h3>
+                        <div id="opponentClock" class="clock">00:00</div>
+                    </div>
+                    
+                    <div id="board" style="width: 100%; margin: 10px auto;"></div>
+                    
+                    <div class="player-bar">
+                        <h3 id="playerNameLabel">Guest</h3>
+                        <div id="playerClock" class="clock">00:00</div>
+                    </div>
+                </div>
+
+                <!-- Columna Derecha: Panel de Info y Botones -->
+                <div class="controls-column">
+                    
+                    <!-- NUEVO HOGAR DEL STATUS -->
+                    <h2 id="status">Waiting for opponent...</h2>
+
+                    <div id="gameControls" style="display: flex; gap: 10px; width: 100%;">
+                        <button id="offerDrawBtn" class="action-btn" style="background-color: #607D8B;">🤝 Offer Draw</button>
+                        <button id="resignBtn" class="action-btn" style="background-color: #d32f2f;">🏳️ Resign</button>
+                    </div>
+                    <button id="quitBtn" class="menu-btn cancel-btn" style="margin-top: 20px; width: 100%;">Quit to Menu</button>
+                </div>
+                
             </div>
-            
-            <div id="board" style="width: 100%; max-width: 400px; margin: 10px auto;"></div>
-            
-            <div class="player-bar">
-                <h3 id="playerNameLabel">Guest</h3>
-                <div id="playerClock" class="clock">00:00</div>
-            </div>
-            
-            <div id="gameControls" style="display: flex; justify-content: space-between; margin-top: 10px; width: 100%; max-width: 400px; margin-left: auto; margin-right: auto;">
-                <button id="offerDrawBtn" class="action-btn" style="background-color: #607D8B;">🤝 Offer Draw</button>
-                <button id="resignBtn" class="action-btn" style="background-color: #d32f2f;">🏳️ Resign</button>
-            </div>
-            
-            <button id="quitBtn" class="menu-btn cancel-btn" style="margin-top: 20px;">Quit to Menu</button>
         </div>
     </div>
     
