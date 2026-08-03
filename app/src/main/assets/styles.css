@@ -326,3 +326,64 @@ input[type="text"] {
     .player-bar h3 { font-size: 1.5rem; }
     .clock { font-size: 1.5rem; }
 }
+
+/* =========================================
+   3. MODO SMART TV / LED 40" (Monitores ultra anchos)
+   Se activa únicamente en resoluciones de 1400px o más.
+   ========================================= */
+@media (min-width: 1400px) {
+    
+    /* 1. Soltamos la correa del menú para que abarque más en la TV */
+    #menu {
+        max-width: 900px; 
+    }
+
+    /* 2. Textos de los títulos mucho más grandes */
+    #menu h2 {
+        font-size: 2.8rem;
+        margin-top: 50px;
+        margin-bottom: 25px;
+    }
+
+    /* Vencemos el font-size: 18px en línea del HTML para leer desde lejos */
+    .dark-panel label, 
+    .dark-panel div {
+        font-size: 1.8rem !important; 
+    }
+
+    /* 3. Botones principales robustos y cómodos para clickear/seleccionar */
+    .menu-btn {
+        font-size: 1.8rem;
+        padding: 20px 40px;
+    }
+
+    /* 4. Agrandamos las cajas de texto (Room Code, Name) */
+    input[type="text"] {
+        font-size: 1.6rem !important; /* Vence el font-size: 14px en línea */
+        padding: 15px !important;
+    }
+
+    /* Ensanchamos la caja de tu nombre (vence el width: 150px en línea) */
+    #playerNameInput {
+        width: 300px !important; 
+    }
+
+    /* 5. Botones cuadrados de niveles y tiempo más grandes */
+    .level-btn {
+        width: 70px;
+        height: 70px;
+        font-size: 1.6rem;
+    }
+
+    /* 6. ¡Llevamos el tablero al límite! (80% del alto de la TV) */
+    .board-column {
+        width: 80vh; 
+        max-width: 1200px;
+    }
+
+    /* Textos del juego gigantes */
+    #status { font-size: 2rem; padding: 20px; }
+    .player-bar h3 { font-size: 2rem; }
+    .clock { font-size: 2.5rem; }
+    .action-btn, #quitBtn { font-size: 1.5rem; padding: 20px; }
+}
