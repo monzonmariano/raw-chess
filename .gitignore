@@ -8,3 +8,4 @@ local.properties
 *.json
 *.png
 IMAGES TO PUBLISH/
+venv/
