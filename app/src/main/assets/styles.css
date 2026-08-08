@@ -70,7 +70,12 @@ body {
     box-shadow: 0px 4px 6px rgba(0,0,0,0.5);
 }
 
-.level-container { display: flex; gap: 4px; justify-content: center; flex-wrap: wrap; }
+.level-container { 
+    display: flex; 
+    gap: 12px; /* Antes era 4px. Esto separa los botones para que el brillo luzca */
+    justify-content: center; 
+    flex-wrap: wrap; 
+}
 
 .level-btn { 
     width: 35px; height: 35px; 
@@ -120,13 +125,13 @@ body {
 
 .player-bar h3 {
     margin: 0;
-    font-size: 20px;
+    font-size: 1.3rem;
     color: #4CAF50;
     text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: 200px;
+    max-width: 100% !important; /* Esto evita que el texto se abrevie con los puntos suspensivos */
 }
 
 .player-bar .clock {
@@ -275,10 +280,10 @@ input[type="text"] {
     }
 
     /* TABLERO: Lo bajamos a 65vh para matar el scroll vertical definitivamente */
-    .board-column {
-        width: 65vh; 
-        max-width: 800px; 
-    }
+   .board-column {
+    width: 60vh; /* Bajamos de 65vh a 60vh */
+    max-width: 800px; 
+}
 
     .player-bar {
         max-width: 100% !important; 
@@ -303,8 +308,8 @@ input[type="text"] {
 
     #gameControls {
         flex-direction: column; 
-        gap: 12px !important; 
-        margin-top: 0 !important; 
+    gap: 20px !important; /* Antes era 12px. Ahora tienen mucho más aire entre sí */
+    margin-top: 0 !important;
     }
 
     .action-btn { 
@@ -316,12 +321,12 @@ input[type="text"] {
     
     #quitBtn { 
         background-color: #424242 !important; 
-        font-size: 1.1rem; 
-        padding: 12px;
-        margin-top: 30px !important; /* Separación clara, pero no exagerada */
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-        width: 100%;
+    font-size: 1.1rem; 
+    padding: 12px;
+    margin-top: 40px !important; /* Lo bajamos un poquito más para separarlo del Resign */
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    width: 100%;
     }
     
     #quitBtn:hover {
