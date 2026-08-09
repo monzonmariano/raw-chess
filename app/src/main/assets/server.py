@@ -109,7 +109,7 @@ async def chess_server(websocket):
                     rooms[room_id] = {'w': p1, 'b': p2}
                     player_to_room[p1] = room_id
                     player_to_room[p2] = room_id
-                    3. Agrégalo al inicio de tu servido
+                   
                     await p1.send(json.dumps({"type": "init", "color": "w", "opponent_name": player_names[p2], "time": match_time}))
                     await p2.send(json.dumps({"type": "init", "color": "b", "opponent_name": player_names[p1], "time": match_time}))
                 else:
