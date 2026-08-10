@@ -15,14 +15,15 @@ private_rooms = {}
 
 
 # ---------------- FUNCION INTERCEPTORA ----------------------
-async def process_request(path, request_headers):
-    # Si la petición NO tiene el encabezado 'Upgrade' (es el cron job o tu navegador)
-    if "Upgrade" not in request_headers:
-        # Le damos un 200 OK y un mensajito para que se queden tranquilos
+# Ahora recibe 'connection' y 'request' (el estándar moderno de la librería)
+async def process_request(connection, request):
+    
+    # Buscamos 'Upgrade' adentro del atributo .headers del request
+    if "Upgrade" not in request.headers:
+        # Si no lo tiene, es el cron job. Le damos el 200 OK.
         return (http.HTTPStatus.OK, [], b"Raw Chess Server is awake y listo para jugar!")
     
-    # Si sí tiene el encabezado, es el juego conectándose. 
-    # Retornamos None para que siga su curso normal.
+    # Si sí lo tiene, es el juego. Lo dejamos pasar.
     return None
 
 def generate_room_code():
