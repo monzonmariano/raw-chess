@@ -16,13 +16,13 @@ private_rooms = {}
 
 # ---------------- FUNCION INTERCEPTORA ----------------------
 async def process_request(path, request_headers):
-    # Si alguien (como el cron job) hace un ping a la ruta principal o a /ping
-    if path == "/" or path == "/ping":
-        # Le devolvemos un 200 OK con un mensajito, sin iniciar WebSocket
-        return (http.HTTPStatus.OK, [], b"Raw Chess Server is awake!")
+    # Si la petición NO tiene el encabezado 'Upgrade' (es el cron job o tu navegador)
+    if "Upgrade" not in request_headers:
+        # Le damos un 200 OK y un mensajito para que se queden tranquilos
+        return (http.HTTPStatus.OK, [], b"Raw Chess Server is awake y listo para jugar!")
     
-    # Si es otra ruta o el juego conectándose, retornamos None
-    # (Esto le dice a la librería: "Deja pasar la conexión, es un WebSocket")
+    # Si sí tiene el encabezado, es el juego conectándose. 
+    # Retornamos None para que siga su curso normal.
     return None
 
 def generate_room_code():
