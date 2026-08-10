@@ -15,15 +15,26 @@ private_rooms = {}
 
 
 # ---------------- FUNCION INTERCEPTORA ----------------------
-# Ahora recibe 'connection' y 'request' (el estándar moderno de la librería)
 async def process_request(connection, request):
+    # 1. Buscamos el encabezado 'upgrade' de forma segura (sin importar mayúsculas)
+    is_websocket = False
+    for key, value in request.headers.items():
+        if key.lower() == "upgrade":
+            is_websocket = True
+            break
     
-    # Buscamos 'Upgrade' adentro del atributo .headers del request
-    if "Upgrade" not in request.headers:
-        # Si no lo tiene, es el cron job. Le damos el 200 OK.
-        return (http.HTTPStatus.OK, [], b"Raw Chess Server is awake y listo para jugar!")
-    
-    # Si sí lo tiene, es el juego. Lo dejamos pasar.
+    # 2. Si NO es el juego (es decir, es el Cron Job tocando la puerta)
+    if not is_websocket:
+        try:
+            # Usamos el formato de Respuesta moderno (websockets 11+)
+            from websockets.http11 import Response
+            return Response(200, "OK", [], b"Raw Chess Server is awake y listo!")
+        except ImportError:
+            # Respaldo por si acaso
+            import http
+            return (http.HTTPStatus.OK, [], b"Raw Chess Server is awake y listo!")
+            
+    # 3. Si ES el juego, retornamos None y lo dejamos pasar limpiamente al tablero
     return None
 
 def generate_room_code():
