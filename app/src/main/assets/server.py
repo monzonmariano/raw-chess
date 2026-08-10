@@ -16,25 +16,27 @@ private_rooms = {}
 
 # ---------------- FUNCION INTERCEPTORA ----------------------
 async def process_request(connection, request):
-    # 1. Buscamos el encabezado 'upgrade' de forma segura (sin importar mayúsculas)
-    is_websocket = False
-    for key, value in request.headers.items():
-        if key.lower() == "upgrade":
-            is_websocket = True
-            break
-    
-    # 2. Si NO es el juego (es decir, es el Cron Job tocando la puerta)
-    if not is_websocket:
-        try:
-            # Usamos el formato de Respuesta moderno (websockets 11+)
-            from websockets.http11 import Response
-            return Response(200, "OK", [], b"Raw Chess Server is awake y listo!")
-        except ImportError:
-            # Respaldo por si acaso
-            import http
-            return (http.HTTPStatus.OK, [], b"Raw Chess Server is awake y listo!")
+    try:
+        # Obtenemos el encabezado 'Upgrade' de forma súper segura
+        upgrade = request.headers.get("Upgrade")
+        
+        # Si no existe o no es 'websocket', es tu navegador o el cron job
+        if upgrade is None or upgrade.lower() != "websocket":
             
-    # 3. Si ES el juego, retornamos None y lo dejamos pasar limpiamente al tablero
+            from websockets.http11 import Response
+            from websockets.datastructures import Headers
+            
+            # EL SECRETO DEL 502: Pasarle un objeto Headers oficial en lugar de una lista []
+            mis_headers = Headers([("Content-Type", "text/plain")])
+            
+            # Ahora la librería puede empaquetar esto sin crashear
+            return Response(200, "OK", mis_headers, b"Raw Chess Server is awake y listo!")
+            
+    except Exception as e:
+        # Si algo rarísimo pasa, lo vemos en los logs de Render y el juego sigue funcionando
+        print(f"Error interceptando request: {e}")
+        
+    # Si sí es 'websocket', devolvemos None y dejamos que la partida inicie
     return None
 
 def generate_room_code():
