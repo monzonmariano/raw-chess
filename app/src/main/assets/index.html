@@ -53,9 +53,11 @@
                 
                 <h2>Play vs Computer</h2>
                 
-                <div style="margin: 15px 0;">
-                    <div style="font-size: 18px; margin-bottom: 10px;">AI Level:</div>
-                    <div id="levelTrack" class="level-container">
+                <div class="dark-panel" style="margin-bottom: 15px;">
+                    <div style="font-size: 18px; font-weight: bold; margin-bottom: 10px;">🤖 AI Level:</div>
+                    
+                    <!-- Límite de 240px y gap reducido para forzar un diseño de 5x2 -->
+                    <div id="levelTrack" class="level-container" style="max-width: 240px; margin: 0 auto; gap: 8px;">
                         <button class="level-btn ai-lvl-btn" data-val="1">1</button>
                         <button class="level-btn ai-lvl-btn" data-val="2">2</button>
                         <button class="level-btn ai-lvl-btn" data-val="3">3</button>
@@ -70,10 +72,10 @@
                 </div>
                 
                 <button id="playAiBtn" class="menu-btn ai-btn">Start AI Game</button>
-                <!-- NUEVO FOOTER PARA DAR ESPACIO AL FINAL -->
-               <div style="margin-top: 50px; padding-bottom: 20px; color: #777; font-size: 14px; text-align: center;">
-                &copy; 2026 Raw Chess. Developed by Mariano.
-        </div>
+               <!-- NUEVO FOOTER PARA DAR ESPACIO AL FINAL -->
+                <div style="margin-top: 50px; padding-bottom: 80px; color: #777; font-size: 14px; text-align: center;">
+                    &copy; 2026 Raw Chess. Developed by Mariano.
+                </div>
             </div>
             
             <div id="lobbyWaiting" class="hidden">
@@ -149,6 +151,15 @@
         <div class="promotion-content" style="width: 280px; text-align: center;">
             <h3 id="customAlertText" style="margin-top: 0; color: #fff; font-size: 18px; line-height: 1.4;">Mensaje</h3>
             <button id="closeAlertBtn" class="promo-btn" style="background-color: #008CBA; font-size: 18px;">OK</button>
+        </div>
+    </div>
+    
+    <div id="confirmQuitModal" class="modal-overlay hidden" style="z-index: 3000;">
+        <div class="promotion-content" style="width: 280px; text-align: center;">
+            <h3 style="margin-top: 0; color: #fff; font-size: 18px;">Are you sure you want to quit?</h3>
+            <p style="color: #ccc; font-size: 14px; margin-bottom: 20px;">The match will be abandoned.</p>
+            <button id="yesQuitBtn" class="promo-btn" style="background-color: #f44336;">🚪 Yes, Quit</button>
+            <button id="noQuitBtn" class="promo-btn" style="background-color: #4CAF50;">❌ Cancel</button>
         </div>
     </div>
 

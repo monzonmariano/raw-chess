@@ -9,13 +9,22 @@ body {
 
 /* Evita que se estire en PC */
 .app-container {
-    max-width: 600px;
+   max-width: 600px;
     margin: 0 auto;
-    padding: 20px;
+    /* 40px arriba (para el reloj/batería), 8px a la derecha, 8px abajo, 8px a la izquierda */
+    padding: 40px 8px 8px 8px;
 }
 
 .hidden {
     display: none !important;
+}
+
+/* Centrar verticalmente el área de juego en celulares */
+#gameArea {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 85vh; /* Usa casi todo el alto de la pantalla para centrar el tablero */
 }
 
 /* Botones Principales */
@@ -117,7 +126,7 @@ body {
     max-width: 400px;
     margin: 5px auto;
     background-color: #2a2a2a;
-    padding: 10px 15px;
+    padding: 6px 12px; /* Altura reducida para móvil */
     border-radius: 5px;
     box-sizing: border-box;
     border: 1px solid #444;
@@ -125,27 +134,27 @@ body {
 
 .player-bar h3 {
     margin: 0;
-    font-size: 1.3rem;
+    font-size: 16px; /* Letra más sutil y limpia */
     color: #4CAF50;
     text-align: left;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    max-width: 100% !important; /* Esto evita que el texto se abrevie con los puntos suspensivos */
+    max-width: 180px;
 }
 
 .player-bar .clock {
     margin: 0;
-    font-size: 24px;
-    padding: 5px 10px;
+    font-size: 18px; /* Reloj proporcionado al celular */
+    padding: 4px 8px;
     width: auto;
     box-shadow: none;
     border: 1px solid #555;
 }
 
 .action-btn {
-    padding: 10px 15px;
-    font-size: 16px;
+   padding: 8px 10px; /* Botones menos "gordos" */
+    font-size: 14px; 
     color: white;
     border: none;
     border-radius: 5px;
@@ -222,6 +231,13 @@ input[type="text"] {
    ========================================= */
 
 /* 1. MODO CELULAR (Por defecto) */
+
+/* Empuja el título hacia abajo para esquivar el reloj/batería del celular */
+h1 {
+   margin-top: 0; 
+    margin-bottom: 15px;
+    font-size: 26px;
+}
 .desktop-layout {
     display: flex;
     flex-direction: column; /* Apila todo hacia abajo */
@@ -237,7 +253,11 @@ input[type="text"] {
 #gameControls {
     justify-content: space-between;
 }
-
+#quitBtn {
+    margin: 20px 0 0 0 !important; /* Mantiene el espacio arriba, pero elimina los márgenes laterales */
+    width: 100% !important;
+    box-sizing: border-box;
+}
 
 
 /* 2. MODO PC / LAPTOP (Pantallas mayores a 768px) */

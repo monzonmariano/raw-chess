@@ -348,7 +348,8 @@ document.getElementById('cancelMatchBtn').addEventListener('click', function() {
     if (shareBtn) shareBtn.classList.add('hidden');
 });
 
-document.getElementById('quitBtn').addEventListener('click', function() {
+// Agrupamos toda la limpieza del juego en una función dedicada
+function performQuit() {
     if (socket) { socket.close(); socket = null; }
     
     game.reset();
@@ -374,6 +375,30 @@ document.getElementById('quitBtn').addEventListener('click', function() {
     document.getElementById('menu').classList.remove('hidden');
     document.getElementById('menuOptions').classList.remove('hidden');
     document.getElementById('lobbyWaiting').classList.add('hidden');
+}
+
+// 1. Al presionar "Quit to Menu"
+document.getElementById('quitBtn').addEventListener('click', function() {
+    var isGameOver = game.game_over() || timeoutLoser || opponentLeft || resignedPlayer || manualDraw;
+    
+    if (isGameOver) {
+        // Si el juego ya terminó, sale directo sin molestar con preguntas
+        performQuit();
+    } else {
+        // Si el juego está vivo, muestra la advertencia
+        document.getElementById('confirmQuitModal').classList.remove('hidden');
+    }
+});
+
+// 2. Al presionar "Cancel" en la advertencia
+document.getElementById('noQuitBtn').addEventListener('click', function() {
+    document.getElementById('confirmQuitModal').classList.add('hidden');
+});
+
+// 3. Al confirmar que sí quiere salir
+document.getElementById('yesQuitBtn').addEventListener('click', function() {
+    document.getElementById('confirmQuitModal').classList.add('hidden');
+    performQuit();
 });
 
 // --- INTELIGENCIA ARTIFICIAL ---
